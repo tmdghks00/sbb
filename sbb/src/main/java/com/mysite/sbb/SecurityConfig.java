@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/") // 로그아웃이 성공하면 루트(/) 페이지로 이동
                         .invalidateHttpSession(true)) // 로그아웃 시 생성된 사용자 세션도 삭제하도록 처리
         ;
+
         return http.build();
     }
 

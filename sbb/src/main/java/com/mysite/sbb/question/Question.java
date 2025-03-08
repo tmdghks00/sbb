@@ -32,4 +32,6 @@ public class Question {
     @ManyToOne // 사용자 한 명이 질문을 여러 개 작성
     private SiteUser author;
 
+    private LocalDateTime modifyDate; // 수정 일시
+
 }

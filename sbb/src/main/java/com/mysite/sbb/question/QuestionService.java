@@ -48,4 +48,16 @@ public class QuestionService {
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
         return this.questionRepository.findAll(pageable);
     }
+
+    // 질문 제목과 내용을 수정할 수 있는 메서드
+    public void modify(Question question, String subject, String content) {
+        question.setSubject(subject);
+        question.setContent(content);
+        question.setModifyDate(LocalDateTime.now());
+        this.questionRepository.save(question);
+    }
+
+    public void delete(Question question) { // 질문 데이터를 삭제
+        this.questionRepository.delete(question);
+    }
 }

@@ -2,6 +2,7 @@ package com.mysite.sbb.question;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.user.SiteUser;
@@ -33,5 +34,8 @@ public class Question {
     private SiteUser author;
 
     private LocalDateTime modifyDate; // 수정 일시
+
+    @ManyToMany // 하나의 질문에 여러 사람이 추천할 수 있고 한 사람이 여러 개의 질문을 추천 가능함
+    Set<SiteUser> voter; // 추천인을 저장하기 위한 속성
 
 }

@@ -60,4 +60,9 @@ public class QuestionService {
     public void delete(Question question) { // 질문 데이터를 삭제
         this.questionRepository.delete(question);
     }
+
+    public void vote(Question question, SiteUser siteUser) { // 추천 기능
+        question.getVoter().add(siteUser);
+        this.questionRepository.save(question);
+    }
 }

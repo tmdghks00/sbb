@@ -96,4 +96,13 @@ public class QuestionController {
         this.questionService.delete(question);
         return "redirect:/"; // 질문을 삭제한 후에는 질문 목록 화면 으로 돌아감
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/vote/{id}")
+    public String questionVote(Principal principal, @PathVariable("id") Integer id) {
+        Question question = this.questionService.getQuestion(id);
+        SiteUser siteUser = this.userService.getUser(principal.getName());
+        this.questionService.vote(question, siteUser); // 사용자를 추천인으로 저장
+        return String.format("redirect:/question/detail/%s", id);
+    } // 추천인을 저장한 후 질문 상세 화면으로 리다이렉트
 }

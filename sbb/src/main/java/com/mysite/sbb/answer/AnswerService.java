@@ -44,4 +44,9 @@ public class AnswerService {
     public void delete(Answer answer) {
         this.answerRepository.delete(answer);
     }
+
+    public void vote(Answer answer, SiteUser siteUser) { // 추천인을 저장하는 메서드
+        answer.getVoter().add(siteUser);
+        this.answerRepository.save(answer);
+    }
 }

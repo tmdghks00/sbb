@@ -18,93 +18,100 @@ import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.server.ResponseStatusException;
 
-@RequestMapping("/question")
-@RequiredArgsConstructor // final이 붙은 속성을 포함하는 생성자를 자동으로 만들어 준다
-@Controller
+@RequestMapping("/question") // "/question" 경로에 대한 요청을 처리하는 컨트롤러
+@RequiredArgsConstructor // final이 붙은 속성을 자동으로 주입하는 생성자 생성
+@Controller // 스프링 MVC 컨트롤러로 등록
 public class QuestionController {
 
-    private final QuestionService questionService;
-    private final UserService userService;
+    private final QuestionService questionService; // 질문 관련 서비스
+    private final UserService userService; // 사용자 관련 서비스
 
+    // 질문 목록 조회 (페이징 처리 & 검색 포함)
     @GetMapping("/list")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
                        @RequestParam(value = "kw", defaultValue = "") String kw) {
-        Page<Question> paging = this.questionService.getList(page, kw);
+        Page<Question> paging = this.questionService.getList(page, kw); // 페이지와 검색어로 질문 조회
         model.addAttribute("paging", paging);
-        model.addAttribute("kw", kw);
-        return "question_list";
+        model.addAttribute("kw", kw); // 검색어 유지
+        return "question_list"; // 질문 목록 페이지 반환
     }
 
+    // 질문 상세 페이지 조회
     @GetMapping(value = "/detail/{id}")
     public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
-        Question question = this.questionService.getQuestion(id);
+        Question question = this.questionService.getQuestion(id); // 해당 질문 조회
         model.addAttribute("question", question);
-        return "question_detail";
+        return "question_detail"; // 질문 상세 페이지 반환
     }
 
+    // 질문 작성 폼 페이지 (로그인한 사용자만 접근 가능)
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String questionCreate(QuestionForm questionForm) {
-        return "question_form";
+        return "question_form"; // 질문 작성 폼 페이지 반환
     }
 
+    // 질문 작성 (로그인한 사용자만 가능)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     public String questionCreate(@Valid QuestionForm questionForm,
                                  BindingResult bindingResult, Principal principal) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) { // 입력값 검증 실패 시 다시 폼 페이지로 이동
             return "question_form";
         }
-        SiteUser siteUser = this.userService.getUser(principal.getName());
-        this.questionService.create(questionForm.getSubject(), questionForm.getContent(), siteUser);
-        return "redirect:/question/list";
+        SiteUser siteUser = this.userService.getUser(principal.getName()); // 현재 로그인한 사용자 조회
+        this.questionService.create(questionForm.getSubject(), questionForm.getContent(), siteUser); // 질문 저장
+        return "redirect:/question/list"; // 질문 목록으로 이동
     }
 
+    // 질문 수정 폼 페이지 (로그인한 사용자만 접근 가능)
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
     public String questionModify(QuestionForm questionForm, @PathVariable("id") Integer id, Principal principal) {
         Question question = this.questionService.getQuestion(id);
-        if(!question.getAuthor().getUsername().equals(principal.getName())) {
+        if (!question.getAuthor().getUsername().equals(principal.getName())) { // 작성자 본인인지 확인
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
-        } // 현재 로그인한 사용자와 질문의 작성자가 동일하지 않을 경우  '수정 권한이 없습니다.' 오류 발생
-        questionForm.setSubject(question.getSubject());
-        questionForm.setContent(question.getContent());
-        return "question_form";
+        }
+        questionForm.setSubject(question.getSubject()); // 기존 제목 설정
+        questionForm.setContent(question.getContent()); // 기존 내용 설정
+        return "question_form"; // 수정 폼 페이지 반환
     }
 
-    //  questionModify 메서드는 questionForm 의 데이터를 검증하고 로그인한 사용자와 수정하려는 질문의 작성자가 동일한지도 검증
+    // 질문 수정 처리
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     public String questionModify(@Valid QuestionForm questionForm, BindingResult bindingResult,
                                  Principal principal, @PathVariable("id") Integer id) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) { // 입력값 검증 실패 시 다시 폼 페이지로 이동
             return "question_form";
         }
         Question question = this.questionService.getQuestion(id);
-        if (!question.getAuthor().getUsername().equals(principal.getName())) {
+        if (!question.getAuthor().getUsername().equals(principal.getName())) { // 작성자 본인인지 확인
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
-        this.questionService.modify(question, questionForm.getSubject(), questionForm.getContent()); // 질문 데이터를 수정
-        return String.format("redirect:/question/detail/%s", id);
-    } // 수정이 완료되면 질문 상세 화면으로 이동
+        this.questionService.modify(question, questionForm.getSubject(), questionForm.getContent()); // 질문 수정
+        return String.format("redirect:/question/detail/%s", id); // 수정 후 상세 페이지로 이동
+    }
 
+    // 질문 삭제 (로그인한 사용자만 가능)
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
     public String questionDelete(Principal principal, @PathVariable("id") Integer id) {
         Question question = this.questionService.getQuestion(id);
-        if (!question.getAuthor().getUsername().equals(principal.getName())) {
+        if (!question.getAuthor().getUsername().equals(principal.getName())) { // 작성자 본인인지 확인
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
-        } //  로그인한 사용자와 질문 작성자가 동일할 경우 앞서 작성한 서비스를 이용하여 질문을 삭제
-        this.questionService.delete(question);
-        return "redirect:/"; // 질문을 삭제한 후에는 질문 목록 화면 으로 돌아감
+        }
+        this.questionService.delete(question); // 질문 삭제
+        return "redirect:/"; // 질문 삭제 후 홈으로 이동
     }
 
+    // 질문 추천 (로그인한 사용자만 가능)
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/vote/{id}")
     public String questionVote(Principal principal, @PathVariable("id") Integer id) {
         Question question = this.questionService.getQuestion(id);
-        SiteUser siteUser = this.userService.getUser(principal.getName());
-        this.questionService.vote(question, siteUser); // 사용자를 추천인으로 저장
-        return String.format("redirect:/question/detail/%s", id);
-    } // 추천인을 저장한 후 질문 상세 화면으로 리다이렉트
+        SiteUser siteUser = this.userService.getUser(principal.getName()); // 현재 로그인한 사용자 정보 가져오기
+        this.questionService.vote(question, siteUser); // 사용자를 추천인으로 추가
+        return String.format("redirect:/question/detail/%s", id); // 추천 후 질문 상세 페이지로 이동
+    }
 }

@@ -13,29 +13,29 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
+@Entity // JPA 엔티티 선언
 public class Question {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 자동 증가 (MySQL AUTO_INCREMENT)
     private Integer id;
 
-    @Column(length = 200)
-    private String subject;
+    @Column(length = 200) // 최대 200자 제한
+    private String subject; // 질문 제목
 
-    @Column(columnDefinition = "TEXT")
-    private String content;
+    @Column(columnDefinition = "TEXT") // 긴 글을 저장할 수 있도록 TEXT 타입 사용
+    private String content; // 질문 내용
 
-    private LocalDateTime createDate;
+    private LocalDateTime createDate; // 질문 작성 시간
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE) // 질문을 삭제하면 그에 달린 답변들도 모두 삭제
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
+    // 질문(One)과 답변(Many) 간의 관계 설정, 질문 삭제 시 답변도 같이 삭제됨
     private List<Answer> answerList;
 
-    @ManyToOne // 사용자 한 명이 질문을 여러 개 작성
-    private SiteUser author;
+    @ManyToOne // 다대일(N:1) 관계, 여러 개의 질문이 하나의 사용자에게 속함
+    private SiteUser author; // 질문 작성자
 
-    private LocalDateTime modifyDate; // 수정 일시
+    private LocalDateTime modifyDate; // 질문 수정 시간
 
-    @ManyToMany // 하나의 질문에 여러 사람이 추천할 수 있고 한 사람이 여러 개의 질문을 추천 가능함
-    Set<SiteUser> voter; // 추천인을 저장하기 위한 속성
-
+    @ManyToMany // 다대다(N:N) 관계, 여러 사용자가 질문을 추천할 수 있음
+    Set<SiteUser> voter; // 추천한 사용자 목록
 }

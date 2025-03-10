@@ -14,23 +14,22 @@ import lombok.Setter;
 @Entity
 public class Answer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 자동 증가 (MySQL의 AUTO_INCREMENT)
     private Integer id;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT") // 긴 문자열 저장을 위한 TEXT 타입 컬럼
     private String content;
 
-    private LocalDateTime createDate;
+    private LocalDateTime createDate; // 답변 작성 시간
 
-    @ManyToOne // N:1 관계 표현 =>  답변=Many  질문 = One
+    @ManyToOne // 다대일(N:1) 관계 => 여러 개의 답변이 하나의 질문에 속함
     private Question question;
 
-    @ManyToOne
+    @ManyToOne // 다대일(N:1) 관계 => 여러 개의 답변이 하나의 사용자(작성자)에 속함
     private SiteUser author;
 
-    private LocalDateTime modifyDate; // 수정일시
+    private LocalDateTime modifyDate; // 답변 수정 시간
 
-    @ManyToMany
+    @ManyToMany // 다대다(N:N) 관계 => 여러 사용자가 하나의 답변을 추천할 수 있음
     Set<SiteUser> voter;
-
 }

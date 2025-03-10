@@ -11,28 +11,31 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Service
+@Service // 서비스 클래스 등록
 public class UserSecurityService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserRepository userRepository; // 사용자 저장소
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<SiteUser> _siteUser = this.userRepository.findByusername(username);
         if (_siteUser.isEmpty()) {
-            throw new UsernameNotFoundException("사용자를 찾을수 없습니다.");
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
         }
         SiteUser siteUser = _siteUser.get();
+
+        // 사용자 권한 설정
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if ("admin".equals(username)) { // 사용자명이 ‘admin’인 경우에는 ADMIN 권한 부여
+        if ("admin".equals(username)) { // 관리자 계정이면 ADMIN 권한 부여
             authorities.add(new SimpleGrantedAuthority(UserRole.ADMIN.getValue()));
-        } else { // 그 이외의 경우에는 USER 권한 부여
+        } else { // 일반 사용자는 USER 권한 부여
             authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
-        } // User 생성자에는 사용자명, 비밀번호, 권한 리스트가 전달
+        }
+
+        // 스프링 시큐리티 사용자 객체 생성
         return new User(siteUser.getUsername(), siteUser.getPassword(), authorities);
     }
 }

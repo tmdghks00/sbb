@@ -9,5 +9,5 @@ import lombok.Setter;
 public class AnswerForm {
 
     @NotEmpty(message = "내용은 필수항목입니다.") // 빈 값이면 오류 메시지 출력
-    private String content;
+    private String content; // 내용
 }

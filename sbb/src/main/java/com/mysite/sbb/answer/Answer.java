@@ -33,3 +33,5 @@ public class Answer {
     @ManyToMany // 다대다(N:N) 관계 => 여러 사용자가 하나의 답변을 추천할 수 있음
     Set<SiteUser> voter;
 }
+
+

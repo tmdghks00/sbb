@@ -50,13 +50,17 @@ public class QuestionService {
         return this.questionRepository.findAll();
     }
 
-    // 특정 ID의 질문 조회 (없으면 예외 발생)
+    // 특정 ID의 질문을 조회하는 메서드 (없으면 예외 발생)
     public Question getQuestion(Integer id) {
+        // 주어진 ID에 해당하는 질문을 데이터베이스에서 찾음 (Optional로 반환)
         Optional<Question> question = this.questionRepository.findById(id);
+
+        // 질문이 존재하면 해당 객체를 반환
         if (question.isPresent()) {
             return question.get();
         } else {
-            throw new DataNotFoundException("question not found"); // 데이터가 없으면 예외 발생
+            // 질문이 존재하지 않으면 예외를 발생시킴
+            throw new DataNotFoundException("question not found");
         }
     }
 

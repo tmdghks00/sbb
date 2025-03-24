@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository // 스프링 빈으로 등록
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
+// JpaRepository 는 CRUD 작업을 처리하는 메서드들을 이미 내장
     Question findBySubject(String subject); // 제목으로 질문 찾기
 
     Question findBySubjectAndContent(String subject, String content); // 제목과 내용이 모두 일치하는 질문 찾기

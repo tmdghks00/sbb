@@ -19,5 +19,5 @@ public class SiteUser {
     private String password; // 암호화된 비밀번호 저장
 
     @Column(unique = true) // 이메일도 중복 저장 불가능 (유니크 제약조건)
-    private String email;
+    private String email; // 이메일 저장
 }

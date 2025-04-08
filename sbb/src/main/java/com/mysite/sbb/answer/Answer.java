@@ -31,7 +31,7 @@ public class Answer {
     private LocalDateTime modifyDate; // 답변 수정 시간
 
     @ManyToMany // 다대다(N:N) 관계 => 여러 사용자가 하나의 답변을 추천할 수 있음
-    Set<SiteUser> voter;
+    Set<SiteUser> voter; //
 }
 
 
